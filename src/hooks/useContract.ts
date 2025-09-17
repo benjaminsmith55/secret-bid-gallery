@@ -1,5 +1,4 @@
-import { useReadContract, useWriteContract, useAccount } from 'wagmi';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 // Contract ABI - This would be generated from the compiled contract
@@ -57,8 +56,15 @@ const CONTRACT_ABI = [
 const CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890' as `0x${string}`;
 
 export const useSecretBidGallery = () => {
-  const { address } = useAccount();
-  const { writeContract } = useWriteContract();
+  const [address, setAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get saved address from localStorage
+    const savedAddress = localStorage.getItem('walletAddress');
+    if (savedAddress) {
+      setAddress(savedAddress);
+    }
+  }, []);
 
   const createNFT = async (
     name: string,
@@ -73,15 +79,11 @@ export const useSecretBidGallery = () => {
         throw new Error('Wallet not connected');
       }
 
-      const hash = await writeContract({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'createNFT',
-        args: [name, description, imageUri, BigInt(reservePrice), BigInt(duration)]
-      });
+      // Simulate contract interaction for demo
+      console.log('Creating NFT:', { name, description, imageUri, reservePrice, duration });
       
-      toast.success('NFT created successfully!');
-      return hash;
+      toast.success('NFT created successfully! (Demo mode)');
+      return '0x1234567890abcdef'; // Mock transaction hash
     } catch (error: any) {
       console.error('Error creating NFT:', error);
       toast.error(error.message || 'Failed to create NFT');
@@ -106,19 +108,10 @@ export const useSecretBidGallery = () => {
       }
 
       // Simulate FHE encryption for demo purposes
-      // In production, this would use actual FHE encryption
-      const encryptedBid = `0x${Buffer.from(bidAmount).toString('hex')}`;
-      const proof = `0x${Buffer.from(inputProof).toString('hex')}`;
+      console.log('Placing bid:', { tokenId, bidAmount, inputProof });
       
-      const hash = await writeContract({
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: 'placeBid',
-        args: [BigInt(tokenId), encryptedBid, proof]
-      });
-      
-      toast.success('Encrypted bid placed successfully!');
-      return hash;
+      toast.success('Encrypted bid placed successfully! (Demo mode)');
+      return '0xabcdef1234567890'; // Mock transaction hash
     } catch (error: any) {
       console.error('Error placing bid:', error);
       toast.error(error.message || 'Failed to place bid');
@@ -134,26 +127,48 @@ export const useSecretBidGallery = () => {
 };
 
 export const useNFTInfo = (tokenId: number) => {
-  return useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getNFTInfo',
-    args: [BigInt(tokenId)]
-  });
+  const [nftInfo, setNftInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Simulate fetching NFT info
+    setIsLoading(true);
+    setTimeout(() => {
+      setNftInfo({
+        name: `NFT #${tokenId}`,
+        description: 'Demo NFT description',
+        imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400',
+        reservePrice: 0.3,
+        currentBid: 0.5,
+        bidCount: 5,
+        isActive: true,
+        isSold: false,
+        owner: '0x1234567890123456789012345678901234567890',
+        currentBidder: '0x0987654321098765432109876543210987654321',
+        startTime: Date.now() - 3600000,
+        endTime: Date.now() + 7200000
+      });
+      setIsLoading(false);
+    }, 1000);
+  }, [tokenId]);
+
+  return { data: nftInfo, isLoading, error: null };
 };
 
 export const useActiveNFTs = () => {
-  return useQuery({
-    queryKey: ['activeNFTs'],
-    queryFn: async () => {
-      // This would fetch all active NFTs from the contract
-      // For now, return mock data
-      return [
+  const [nfts, setNfts] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Simulate fetching active NFTs
+    setTimeout(() => {
+      setNfts([
         {
           tokenId: 1,
           name: "Crypto Art #1",
           description: "A beautiful piece of digital art",
-          imageUri: "/src/assets/nft-1.jpg",
+          imageUri: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400",
           reservePrice: 1,
           currentBid: 0,
           bidCount: 0,
@@ -168,7 +183,7 @@ export const useActiveNFTs = () => {
           tokenId: 2,
           name: "Digital Collectible #2",
           description: "Rare digital collectible",
-          imageUri: "/src/assets/nft-2.jpg",
+          imageUri: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400",
           reservePrice: 2,
           currentBid: 0,
           bidCount: 0,
@@ -183,7 +198,7 @@ export const useActiveNFTs = () => {
           tokenId: 3,
           name: "Blockchain Art #3",
           description: "Unique blockchain artwork",
-          imageUri: "/src/assets/nft-3.jpg",
+          imageUri: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400",
           reservePrice: 3,
           currentBid: 0,
           bidCount: 0,
@@ -194,7 +209,10 @@ export const useActiveNFTs = () => {
           startTime: Date.now() - 259200000, // 3 days ago
           endTime: Date.now() + 259200000 // 3 days from now
         }
-      ];
-    }
-  });
+      ]);
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  return { data: nfts, isLoading, error };
 };
