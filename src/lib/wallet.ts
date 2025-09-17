@@ -1,25 +1,24 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { sepolia, mainnet } from 'wagmi/chains';
-import { http } from 'viem';
+import { sepolia } from 'wagmi/chains';
 
-// Ensure we have valid environment variables
-const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
-const rpcUrl = import.meta.env.VITE_RPC_URL;
+// Use a stable demo project ID to avoid undefined errors
+const DEMO_PROJECT_ID = '2ec9743d0d0cd7fb94dee1a7e6d33475';
 
-if (!projectId || projectId === 'YOUR_WALLET_CONNECT_PROJECT_ID') {
-  console.warn('WalletConnect Project ID not configured. Please set VITE_WALLET_CONNECT_PROJECT_ID');
-}
-
+// Create a simple, stable configuration
 export const config = getDefaultConfig({
   appName: 'Secret Bid Gallery',
-  projectId: projectId || 'demo-project-id',
-  chains: [sepolia, mainnet],
-  transports: {
-    [sepolia.id]: http(rpcUrl || 'https://sepolia.infura.io/v3/demo'),
-    [mainnet.id]: http('https://eth.llamarpc.com'),
-  },
+  projectId: DEMO_PROJECT_ID,
+  chains: [sepolia],
   ssr: false,
 });
 
-export const chainId = parseInt(import.meta.env.VITE_CHAIN_ID || '11155111');
-export const rpcUrlConfig = rpcUrl || 'https://sepolia.infura.io/v3/demo';
+export const chainId = 11155111; // Sepolia chain ID
+export const rpcUrlConfig = 'https://sepolia.infura.io/v3/demo';
+
+// Export a simple config for debugging
+console.log('Wallet config initialized:', {
+  appName: 'Secret Bid Gallery',
+  projectId: DEMO_PROJECT_ID,
+  chainId: sepolia.id,
+  chainName: sepolia.name
+});

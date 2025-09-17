@@ -53,7 +53,8 @@ const CONTRACT_ABI = [
 ] as const;
 
 // Contract address - This would be the deployed contract address
-const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'; // Placeholder
+// Use a demo contract address for development
+const CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890' as `0x${string}`;
 
 export const useSecretBidGallery = () => {
   const { address } = useAccount();

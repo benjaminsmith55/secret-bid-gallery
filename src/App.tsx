@@ -7,6 +7,7 @@ import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { config } from '@/lib/wallet';
 import Index from "./pages/Index";
+import TestPage from "./pages/TestPage";
 import NotFound from "./pages/NotFound";
 import '@rainbow-me/rainbowkit/styles.css';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -14,49 +15,62 @@ import { ErrorBoundary } from 'react-error-boundary';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: false,
       refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
     },
   },
 });
 
-function ErrorFallback({ error }: { error: Error }) {
+function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center p-8">
+      <div className="text-center p-8 max-w-md">
         <h2 className="text-2xl font-bold text-destructive mb-4">Something went wrong</h2>
-        <p className="text-muted-foreground mb-4">{error.message}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-        >
-          Reload Page
-        </button>
+        <p className="text-muted-foreground mb-4 text-sm">
+          {error.message || 'An unexpected error occurred'}
+        </p>
+        <div className="space-x-2">
+          <button 
+            onClick={resetErrorBoundary}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Try Again
+          </button>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
+          >
+            Reload Page
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-const App = () => (
-  <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  </ErrorBoundary>
-);
+const App = () => {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<TestPage />} />
+                  <Route path="/main" element={<Index />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;
