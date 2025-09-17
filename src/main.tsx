@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import AppNoRainbow from "./AppNoRainbow.tsx";
+import AppMinimal from "./AppMinimal.tsx";
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(<AppNoRainbow />);
+createRoot(document.getElementById("root")!).render(<AppMinimal />);
