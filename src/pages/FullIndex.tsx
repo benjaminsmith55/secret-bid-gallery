@@ -1,7 +1,7 @@
 import { useAccount } from 'wagmi';
 import { WalletConnect } from "@/components/WalletConnect";
 import { AuctionGallery } from "@/components/AuctionGallery";
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 
 const FullIndex = () => {
   const { address, isConnected } = useAccount();
