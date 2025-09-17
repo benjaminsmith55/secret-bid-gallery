@@ -36,27 +36,16 @@ const AuctionCard = ({
   const { address, isConnected } = useAccount();
 
   const handlePlaceBid = async () => {
-    if (!isConnected) {
-      alert("Please connect your wallet first");
-      return;
-    }
-    
-    if (!bidAmount || parseFloat(bidAmount) <= 0) {
-      alert("Please enter a valid bid amount");
-      return;
-    }
-
     try {
       // Generate a proof for the bid (simulated for demo)
       const timestamp = Date.now().toString();
       const inputProof = `${bidAmount}-${timestamp}-${address}`;
       
       await placeBid(tokenId, bidAmount, inputProof);
-      alert("Encrypted bid placed successfully! Your bid is now private until auction end.");
       setBidAmount("");
     } catch (error) {
+      // Error handling is now done in the hook
       console.error("Error placing bid:", error);
-      alert("Failed to place bid. Please try again.");
     }
   };
 

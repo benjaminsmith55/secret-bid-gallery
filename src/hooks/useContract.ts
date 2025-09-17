@@ -1,5 +1,6 @@
 import { useReadContract, useWriteContract, useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 // Contract ABI - This would be generated from the compiled contract
 const CONTRACT_ABI = [
@@ -66,15 +67,23 @@ export const useSecretBidGallery = () => {
     duration: number
   ) => {
     try {
+      if (!address) {
+        toast.error('Please connect your wallet first');
+        throw new Error('Wallet not connected');
+      }
+
       const hash = await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'createNFT',
         args: [name, description, imageUri, BigInt(reservePrice), BigInt(duration)]
       });
+      
+      toast.success('NFT created successfully!');
       return hash;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating NFT:', error);
+      toast.error(error.message || 'Failed to create NFT');
       throw error;
     }
   };
@@ -85,6 +94,16 @@ export const useSecretBidGallery = () => {
     inputProof: string
   ) => {
     try {
+      if (!address) {
+        toast.error('Please connect your wallet first');
+        throw new Error('Wallet not connected');
+      }
+
+      if (!bidAmount || parseFloat(bidAmount) <= 0) {
+        toast.error('Please enter a valid bid amount');
+        throw new Error('Invalid bid amount');
+      }
+
       // Simulate FHE encryption for demo purposes
       // In production, this would use actual FHE encryption
       const encryptedBid = `0x${Buffer.from(bidAmount).toString('hex')}`;
@@ -96,9 +115,12 @@ export const useSecretBidGallery = () => {
         functionName: 'placeBid',
         args: [BigInt(tokenId), encryptedBid, proof]
       });
+      
+      toast.success('Encrypted bid placed successfully!');
       return hash;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error placing bid:', error);
+      toast.error(error.message || 'Failed to place bid');
       throw error;
     }
   };
