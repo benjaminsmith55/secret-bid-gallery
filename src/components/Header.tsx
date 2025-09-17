@@ -1,4 +1,4 @@
-import SimpleConnectButton from './SimpleConnectButton';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Lock, Layers } from "lucide-react";
 
 const Header = () => {
@@ -34,7 +34,7 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-3">
-            <SimpleConnectButton />
+            <ConnectButton />
           </div>
         </div>
       </div>

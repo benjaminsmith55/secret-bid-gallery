@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useReadContract, useWriteContract, useAccount } from 'wagmi';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 // Contract ABI - This would be generated from the compiled contract
@@ -56,15 +57,8 @@ const CONTRACT_ABI = [
 const CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890' as `0x${string}`;
 
 export const useSecretBidGallery = () => {
-  const [address, setAddress] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Get saved address from localStorage
-    const savedAddress = localStorage.getItem('walletAddress');
-    if (savedAddress) {
-      setAddress(savedAddress);
-    }
-  }, []);
+  const { address } = useAccount();
+  const { writeContract } = useWriteContract();
 
   const createNFT = async (
     name: string,
@@ -127,43 +121,21 @@ export const useSecretBidGallery = () => {
 };
 
 export const useNFTInfo = (tokenId: number) => {
-  const [nftInfo, setNftInfo] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    // Simulate fetching NFT info
-    setIsLoading(true);
-    setTimeout(() => {
-      setNftInfo({
-        name: `NFT #${tokenId}`,
-        description: 'Demo NFT description',
-        imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400',
-        reservePrice: 0.3,
-        currentBid: 0.5,
-        bidCount: 5,
-        isActive: true,
-        isSold: false,
-        owner: '0x1234567890123456789012345678901234567890',
-        currentBidder: '0x0987654321098765432109876543210987654321',
-        startTime: Date.now() - 3600000,
-        endTime: Date.now() + 7200000
-      });
-      setIsLoading(false);
-    }, 1000);
-  }, [tokenId]);
-
-  return { data: nftInfo, isLoading, error: null };
+  return useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: 'getNFTInfo',
+    args: [BigInt(tokenId)]
+  });
 };
 
 export const useActiveNFTs = () => {
-  const [nfts, setNfts] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    // Simulate fetching active NFTs
-    setTimeout(() => {
-      setNfts([
+  return useQuery({
+    queryKey: ['activeNFTs'],
+    queryFn: async () => {
+      // This would fetch all active NFTs from the contract
+      // For now, return mock data
+      return [
         {
           tokenId: 1,
           name: "Crypto Art #1",
@@ -209,10 +181,7 @@ export const useActiveNFTs = () => {
           startTime: Date.now() - 259200000, // 3 days ago
           endTime: Date.now() + 259200000 // 3 days from now
         }
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  return { data: nfts, isLoading, error };
+      ];
+    }
+  });
 };
