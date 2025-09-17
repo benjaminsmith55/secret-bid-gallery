@@ -1,28 +1,15 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { sepolia } from 'wagmi/chains';
-import { http } from 'viem';
 
-// Use a stable demo project ID to avoid undefined errors
-const DEMO_PROJECT_ID = '2ec9743d0d0cd7fb94dee1a7e6d33475';
+// Get environment variables
+const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || 'YOUR_WALLET_CONNECT_PROJECT_ID';
+const rpcUrl = import.meta.env.VITE_RPC_URL || 'YOUR_RPC_URL';
 
-// Create a minimal configuration to avoid toUpperCase errors
 export const config = getDefaultConfig({
   appName: 'Secret Bid Gallery',
-  projectId: DEMO_PROJECT_ID,
+  projectId,
   chains: [sepolia],
-  transports: {
-    [sepolia.id]: http(),
-  },
   ssr: false,
 });
 
-export const chainId = 11155111; // Sepolia chain ID
-export const rpcUrlConfig = 'https://sepolia.infura.io/v3/demo';
-
-// Export a simple config for debugging
-console.log('Wallet config initialized:', {
-  appName: 'Secret Bid Gallery',
-  projectId: DEMO_PROJECT_ID,
-  chainId: sepolia.id,
-  chainName: sepolia.name
-});
+export const chains = [sepolia];
