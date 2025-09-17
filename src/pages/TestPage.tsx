@@ -1,8 +1,8 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import SimpleWallet from '@/components/SimpleWallet';
+import { useState } from 'react';
 
 const TestPage = () => {
-  const { address, isConnected } = useAccount();
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -13,13 +13,16 @@ const TestPage = () => {
           <h2 className="text-xl font-semibold mb-4">Wallet Connection Test</h2>
           <div className="space-y-4">
             <div>
-              <strong>Connection Status:</strong> {isConnected ? 'Connected' : 'Not Connected'}
+              <strong>Connection Status:</strong> {walletAddress ? 'Connected' : 'Not Connected'}
             </div>
             <div>
-              <strong>Address:</strong> {address || 'No address'}
+              <strong>Address:</strong> {walletAddress || 'No address'}
             </div>
             <div>
-              <ConnectButton />
+              <SimpleWallet 
+                onConnect={setWalletAddress}
+                onDisconnect={() => setWalletAddress(null)}
+              />
             </div>
           </div>
         </div>
