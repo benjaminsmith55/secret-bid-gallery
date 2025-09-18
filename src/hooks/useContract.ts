@@ -1,4 +1,3 @@
-import { useReadContract, useWriteContract, useAccount } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -56,9 +55,7 @@ const CONTRACT_ABI = [
 // Use a demo contract address for development
 const CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890' as `0x${string}`;
 
-export const useSecretBidGallery = () => {
-  const { address } = useAccount();
-  const { writeContract } = useWriteContract();
+export const useSecretBidGallery = (address?: string) => {
 
   const createNFT = async (
     name: string,
@@ -121,12 +118,25 @@ export const useSecretBidGallery = () => {
 };
 
 export const useNFTInfo = (tokenId: number) => {
-  return useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getNFTInfo',
-    args: [BigInt(tokenId)]
-  });
+  // Mock implementation for demo
+  return {
+    data: {
+      name: `NFT #${tokenId}`,
+      description: "A beautiful NFT",
+      imageUri: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400",
+      reservePrice: 1,
+      currentBid: 0,
+      bidCount: 0,
+      isActive: true,
+      isSold: false,
+      owner: "0x0000000000000000000000000000000000000000",
+      currentBidder: "0x0000000000000000000000000000000000000000",
+      startTime: Date.now() - 86400000,
+      endTime: Date.now() + 86400000
+    },
+    isLoading: false,
+    error: null
+  };
 };
 
 export const useActiveNFTs = () => {

@@ -4,7 +4,11 @@ import nft1 from "@/assets/nft-1.jpg";
 import nft2 from "@/assets/nft-2.jpg";
 import nft3 from "@/assets/nft-3.jpg";
 
-const AuctionGallery = () => {
+interface AuctionGalleryProps {
+  address?: string;
+}
+
+const AuctionGallery = ({ address }: AuctionGalleryProps) => {
   const { data: nfts, isLoading, error } = useActiveNFTs();
 
   // Fallback data if contract data is not available
@@ -76,7 +80,7 @@ const AuctionGallery = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {auctions.map((auction) => (
-              <AuctionCard key={auction.id} {...auction} />
+              <AuctionCard key={auction.id} {...auction} address={address} />
             ))}
           </div>
         )}

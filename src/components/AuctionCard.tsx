@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Clock, Eye, EyeOff, Zap } from "lucide-react";
 import { useSecretBidGallery } from "@/hooks/useContract";
-import { useAccount } from "wagmi";
 
 interface AuctionCardProps {
   id: string;
@@ -17,6 +16,7 @@ interface AuctionCardProps {
   isEncrypted: boolean;
   bidCount: number;
   tokenId: number;
+  address?: string;
 }
 
 const AuctionCard = ({ 
@@ -32,8 +32,7 @@ const AuctionCard = ({
 }: AuctionCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
-  const { placeBid } = useSecretBidGallery();
-  const { address, isConnected } = useAccount();
+  const { placeBid } = useSecretBidGallery(address);
 
   const handlePlaceBid = async () => {
     try {
