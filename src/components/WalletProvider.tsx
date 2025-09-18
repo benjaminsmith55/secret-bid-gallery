@@ -1,26 +1,8 @@
 import '@rainbow-me/rainbowkit/styles.css';
-import {
-  getDefaultConfig,
-  RainbowKitProvider,
-} from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
-import {
-  sepolia,
-} from 'wagmi/chains';
-import {
-  QueryClientProvider,
-  QueryClient,
-} from "@tanstack/react-query";
-import { http } from 'viem';
-
-const config = getDefaultConfig({
-  appName: 'Secret Bid Gallery',
-  projectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || '2ec9743d0d0cd7fb94dee1a7e6d33475',
-  chains: [sepolia],
-  transports: {
-    [sepolia.id]: http(import.meta.env.VITE_RPC_URL || 'https://sepolia.infura.io/v3/demo'),
-  },
-});
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { config } from '@/lib/wallet';
 
 const queryClient = new QueryClient();
 
