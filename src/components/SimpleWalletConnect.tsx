@@ -13,23 +13,41 @@ export const SimpleWalletConnect = ({ onConnect }: SimpleWalletConnectProps) => 
     setIsConnecting(true);
     
     try {
-      // Check if MetaMask is installed
+      // Check if any Web3 wallet is installed
       if (typeof window.ethereum === 'undefined') {
-        alert('Please install MetaMask or another Web3 wallet to continue.');
+        alert('Please install MetaMask, Coinbase Wallet, or another Web3 wallet to continue.');
         return;
       }
 
-      // Request account access
+      // Check if already connected
       const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
+        method: 'eth_accounts',
       });
 
       if (accounts.length > 0) {
         onConnect(accounts[0]);
+        return;
       }
-    } catch (error) {
+
+      // Request account access
+      const newAccounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+
+      if (newAccounts.length > 0) {
+        onConnect(newAccounts[0]);
+      }
+    } catch (error: any) {
       console.error('Failed to connect wallet:', error);
-      alert('Failed to connect wallet. Please try again.');
+      
+      // Handle specific error cases
+      if (error.code === 4001) {
+        alert('Connection rejected by user. Please try again and approve the connection.');
+      } else if (error.code === -32002) {
+        alert('Connection request already pending. Please check your wallet.');
+      } else {
+        alert(`Failed to connect wallet: ${error.message || 'Unknown error'}`);
+      }
     } finally {
       setIsConnecting(false);
     }

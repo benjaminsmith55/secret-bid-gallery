@@ -6,14 +6,50 @@ import { SimpleWalletConnect } from "@/components/SimpleWalletConnect";
 import AuctionGallery from "@/components/AuctionGallery";
 import Header from "@/components/Header";
 import NotFound from "@/components/NotFound";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const AppSimple = () => {
   const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+
+  // Check for existing connection on mount
+  useEffect(() => {
+    const checkExistingConnection = async () => {
+      try {
+        if (typeof window.ethereum !== 'undefined') {
+          const accounts = await window.ethereum.request({
+            method: 'eth_accounts',
+          });
+          
+          if (accounts.length > 0) {
+            setConnectedAddress(accounts[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking existing connection:', error);
+      } finally {
+        setIsCheckingConnection(false);
+      }
+    };
+
+    checkExistingConnection();
+  }, []);
 
   const handleConnect = (address: string) => {
     setConnectedAddress(address);
   };
+
+  // Show loading state while checking connection
+  if (isCheckingConnection) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-secondary">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking wallet connection...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!connectedAddress) {
     return <SimpleWalletConnect onConnect={handleConnect} />;
